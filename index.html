@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>FriendChat</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+<div id="login">
+
+<h2>FriendChat</h2>
+
+<input id="username"
+placeholder="Username">
+
+<input id="password"
+type="password"
+placeholder="Password">
+
+<button onclick="signup()">
+Sign Up
+</button>
+
+<button onclick="login()">
+Login
+</button>
+
+<p id="friendCode"></p>
+
+</div>
+
+<div id="app">
+
+<div id="sidebar">
+
+<h3>Friends</h3>
+
+<input id="friendInput"
+placeholder="Friend Code">
+
+<button onclick="addFriend()">
+Add Friend
+</button>
+
+<ul id="friends"></ul>
+
+</div>
+
+<div id="chatArea">
+
+<div id="messages"></div>
+
+<div id="bottom">
+
+<input id="messageBox"
+placeholder="Message">
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
