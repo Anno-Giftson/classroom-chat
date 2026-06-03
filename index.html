@@ -8,62 +8,78 @@
 
 <body>
 
+<!-- LOGIN -->
 <div id="login">
 
-<h2>FriendChat</h2>
+  <div class="card">
 
-<input id="username"
-placeholder="Username">
+    <h1>FriendChat</h1>
 
-<input id="password"
-type="password"
-placeholder="Password">
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
 
-<button onclick="signup()">
-Sign Up
-</button>
+    <button class="primary" onclick="signup()">Sign Up</button>
+    <button onclick="login()">Login</button>
 
-<button onclick="login()">
-Login
-</button>
+    <p id="friendCode"></p>
 
-<p id="friendCode"></p>
+  </div>
 
 </div>
 
+<!-- APP -->
 <div id="app">
 
-<div id="sidebar">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
 
-<h3>Friends</h3>
+    <div class="profile">
+      <div class="name" id="myName">User</div>
 
-<input id="friendInput"
-placeholder="Friend Code">
+      <div class="codeBox">
+        <span id="myCode">------</span>
+        <button class="small" onclick="copyCode()">Copy</button>
+      </div>
+    </div>
 
-<button onclick="addFriend()">
-Add Friend
-</button>
+    <hr>
 
-<ul id="friends"></ul>
+    <div class="sectionTitle">Add Friend</div>
 
-</div>
+    <input id="friendInput" placeholder="Friend Code">
+    <button class="primary" onclick="addFriend()">Send Request</button>
 
-<div id="chatArea">
+    <hr>
 
-<div id="messages"></div>
+    <div class="sectionTitle">Requests</div>
+    <div id="requests"></div>
 
-<div id="bottom">
+    <hr>
 
-<input id="messageBox"
-placeholder="Message">
+    <div class="sectionTitle">Friends</div>
+    <ul id="friends"></ul>
 
-<button onclick="sendMessage()">
-Send
-</button>
+  </div>
 
-</div>
+  <!-- CHAT -->
+  <div id="chat">
 
-</div>
+    <div id="chatHeader">
+      <div id="chatTitle">Select a friend</div>
+    </div>
+
+    <div id="messages">
+      <div class="empty">No chat selected</div>
+    </div>
+
+    <div id="chatBottom">
+
+      <input id="messageBox" placeholder="Message...">
+      <button class="primary" onclick="sendMessage()">Send</button>
+
+    </div>
+
+  </div>
 
 </div>
 
