@@ -1,180 +1,197 @@
-const API =
-"https://script.google.com/macros/s/AKfycbxtmNAII4Heidtt7veMcNEFIRm2Y1druoJFCzTkSo4xk41x1XTd0Gf4XAM2gEb8MbLK_Q/exec";
+const API = "https://script.google.com/macros/s/AKfycbwQuj1bRwLJPQp1b4u_oiNduCu4oBGCV72nAZ8zoWm60KRb6_OCFd8W1eHGyX5OhVLOew/exec";
+
 let myCode = "";
+let myName = "";
 let currentFriend = "";
 
-async function api(data){
+/* ---------------- API ---------------- */
 
- const res = await fetch(API,{
-   method:"POST",
-   body:JSON.stringify(data)
- });
-
- return await res.json();
+async function api(data) {
+  const res = await fetch(API, {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+  return await res.json();
 }
 
-async function signup(){
+/* ---------------- AUTH ---------------- */
 
- const username =
- document.getElementById("username").value;
+async function signup() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
- const password =
- document.getElementById("password").value;
+  const res = await api({
+    action: "signup",
+    username,
+    password
+  });
 
- const result =
- await api({
-   action:"signup",
-   username,
-   password
- });
-
- if(result.success){
-
-   document.getElementById(
-   "friendCode"
-   ).innerText =
-   "Friend Code: " +
-   result.friendCode;
- }
+  if (res.success) {
+    document.getElementById("friendCode").innerText =
+      "Your Code: " + res.friendCode;
+  } else {
+    alert(res.message || "Signup failed");
+  }
 }
 
-async function login(){
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
- const username =
- document.getElementById("username").value;
+  const res = await api({
+    action: "login",
+    username,
+    password
+  });
 
- const password =
- document.getElementById("password").value;
+  if (!res.success) {
+    alert("Login failed");
+    return;
+  }
 
- const result =
- await api({
-   action:"login",
-   username,
-   password
- });
+  myCode = res.friendCode;
+  myName = res.username;
 
- if(result.success){
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "flex";
 
-   myCode =
-   result.friendCode;
+  document.getElementById("myCode").innerText = myCode;
+  document.getElementById("myName").innerText = myName;
 
-   document.getElementById(
-   "login"
-   ).style.display="none";
-
-   document.getElementById(
-   "app"
-   ).style.display="flex";
-
-   loadFriends();
- }
+  loadFriends();
+  loadRequests();
 }
 
-async function addFriend(){
+/* ---------------- FRIEND CODE COPY ---------------- */
 
- const friend =
- document.getElementById(
- "friendInput"
- ).value;
-
- await api({
-   action:"sendFriendRequest",
-   from:myCode,
-   to:friend
- });
-
- alert("Request sent");
+function copyCode() {
+  navigator.clipboard.writeText(myCode);
+  alert("Friend code copied");
 }
 
-async function loadFriends(){
+/* ---------------- FRIEND REQUESTS ---------------- */
 
- const friends =
- await api({
-   action:"getFriends",
-   user:myCode
- });
+async function addFriend() {
+  const code = document.getElementById("friendInput").value;
 
- const ul =
- document.getElementById(
- "friends"
- );
+  const res = await api({
+    action: "sendFriendRequest",
+    from: myCode,
+    to: code
+  });
 
- ul.innerHTML="";
-
- friends.forEach(friend=>{
-
-   const li =
-   document.createElement("li");
-
-   li.className="friend";
-
-   li.innerText=friend;
-
-   li.onclick=()=>{
-     currentFriend=friend;
-     loadMessages();
-   };
-
-   ul.appendChild(li);
- });
+  alert(res.message || "Request sent");
+  loadRequests();
 }
 
-async function loadMessages(){
+async function loadRequests() {
+  const res = await api({
+    action: "getFriendRequests",
+    user: myCode
+  });
 
- const messages =
- await api({
-   action:"getMessages",
-   user:myCode,
-   friend:currentFriend
- });
+  const box = document.getElementById("requests");
+  box.innerHTML = "";
 
- const div =
- document.getElementById(
- "messages"
- );
+  res.forEach(r => {
+    const div = document.createElement("div");
+    div.className = "request";
 
- div.innerHTML="";
+    div.innerHTML = `
+      <span>${r.code}</span>
+      <button onclick="acceptFriend('${r.code}')">Accept</button>
+    `;
 
- messages.forEach(m=>{
-
-   const msg =
-   document.createElement("div");
-
-   msg.className =
-   "message " +
-   (m[1]===myCode
-   ? "me"
-   : "them");
-
-   msg.innerText = m[3];
-
-   div.appendChild(msg);
- });
+    box.appendChild(div);
+  });
 }
 
-async function sendMessage(){
+async function acceptFriend(friendCode) {
+  await api({
+    action: "acceptFriend",
+    user: myCode,
+    friend: friendCode
+  });
 
- const text =
- document.getElementById(
- "messageBox"
- ).value;
-
- await api({
-   action:"sendMessage",
-   from:myCode,
-   to:currentFriend,
-   message:text
- });
-
- document.getElementById(
- "messageBox"
- ).value="";
-
- loadMessages();
+  loadFriends();
+  loadRequests();
 }
 
-setInterval(()=>{
- if(currentFriend){
-   loadMessages();
- }
-},3000);
+/* ---------------- FRIEND LIST ---------------- */
+
+async function loadFriends() {
+  const res = await api({
+    action: "getFriends",
+    user: myCode
+  });
+
+  const list = document.getElementById("friends");
+  list.innerHTML = "";
+
+  res.forEach(f => {
+    const li = document.createElement("li");
+    li.innerText = f.username || f.code;
+
+    li.onclick = () => {
+      currentFriend = f.code;
+      document.getElementById("chatTitle").innerText = f.username;
+      loadMessages();
+    };
+
+    list.appendChild(li);
+  });
+}
+
+/* ---------------- MESSAGES ---------------- */
+
+async function loadMessages() {
+  if (!currentFriend) return;
+
+  const res = await api({
+    action: "getMessages",
+    user: myCode,
+    friend: currentFriend
+  });
+
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+
+  res.forEach(m => {
+    const div = document.createElement("div");
+
+    div.className =
+      "msg " + (m.from === myCode ? "me" : "them");
+
+    div.innerText = m.message;
+
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = document.getElementById("messageBox").value;
+  if (!text || !currentFriend) return;
+
+  await api({
+    action: "sendMessage",
+    from: myCode,
+    to: currentFriend,
+    message: text
+  });
+
+  document.getElementById("messageBox").value = "";
+  loadMessages();
+}
+
+/* ---------------- AUTO REFRESH ---------------- */
+
+setInterval(() => {
+  if (myCode) {
+    loadRequests();
+    if (currentFriend) {
+      loadMessages();
+    }
+  }
+}, 4000);
