@@ -1,5 +1,5 @@
 const API =
-"https://script.google.com/macros/s/AKfycbzhbnw9GJMTT3pj3acihIaPCWhTCc8u5gwJcRfEKi5tiobXNkDLEPKWT963rpDQDbh6aA/exec";
+"https://script.google.com/macros/s/AKfycbxtmNAII4Heidtt7veMcNEFIRm2Y1druoJFCzTkSo4xk41x1XTd0Gf4XAM2gEb8MbLK_Q/exec";
 let myCode = "";
 let currentFriend = "";
 
